@@ -1,85 +1,62 @@
-function products() {
-    document.getElementById('cardHeader').innerHTML = '<h5 class="text-white">Nuestros Productos</h5>';
+function showShoppingCarts() {
+    document.getElementById('cardHeader').innerHTML = '<h5 class="text-white"> Sección de Carritos de Compras</h5>';
 
-    fetch('https://dummyjson.com/products')
-        .then(response => response.json())
+    fetch('https://dummyjson.com/carts')
+        .then(res => res.json())
         .then(data => {
-            let listProduct = `
-        <div class="table-responsive">
-          <table class="table table-striped table-hover border-success">
-            <thead class="table-success text-white">
-              <tr>
-                <th>#</th>
-                <th>Nombre</th>
-                <th>Precio</th>
-                <th>Descripción</th>
-                <th>Imagen</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody>`;
+            console.log('Carritos:', data);
 
-            data.products.forEach(product => {
-                listProduct += `
-          <tr>
-            <td>${product.id}</td>
-            <td class="fw-bold text-success">${product.title}</td>
-            <td class="text-primary">$${product.price.toFixed(2)}</td>
-            <td class="text-secondary">${product.description}</td>
-            <td><img src="${product.images[0]}" class="img-thumbnail rounded shadow-sm" style="width: 60px;"></td>
-            <td>
-              <button class="btn btn-sm btn-outline-success" onclick="getProduct(${product.id})">Ver Detalles</button>
-            </td>
-          </tr>`;
-            });
+            let cartsHtml = '';
 
-            listProduct += `</tbody></table></div>`;
-            document.getElementById('info').innerHTML = listProduct;
-        })
-        .catch(error => {
-            console.error('Error al obtener productos:', error);
-            document.getElementById('info').innerHTML = '<p class="text-danger">Error al cargar productos</p>';
-        });
-}
+            data.carts.forEach(cart => {
+                cartsHtml += `
+        <div class="mb-5 p-3 border rounded shadow-sm bg-light">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="text-primary m-0"> Carrito #${cart.id}</h5>
+            <span class="badge bg-dark text-white"> Usuario: ${cart.userId}</span>
+          </div>
+          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        `;
 
-function getProduct(idProduct) {
-    fetch(`https://dummyjson.com/products/${idProduct}`)
-        .then(response => response.json())
-        .then(product => {
-            const modalProduct = `
-        <div class="modal fade" id="modalProduct" tabindex="-1">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header bg-success text-white">
-                <h5 class="modal-title">Detalles del Producto</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-              </div>
-              <div class="modal-body text-center">
-                <div class="card shadow-sm border-success">
-                  <img src="${product.images[0]}" class="card-img-top rounded mx-auto mt-3" style="width: 200px;">
-                  <div class="card-body">
-                    <h5 class="card-title text-success">${product.title}</h5>
-                    <p class="card-text"><strong>Precio:</strong> $${product.price.toFixed(2)}</p>
-                    <p class="card-text text-secondary">${product.description}</p>
-                    <p class="card-text"><strong>Marca:</strong> ${product.brand}</p>
-                    <p class="card-text"><strong>Disponibilidad:</strong> ${product.availabilityStatus}</p>
-                    <p class="card-text"><strong>Política de devoluciones:</strong> ${product.returnPolicy}</p>
+                cart.products.forEach(product => {
+                    cartsHtml += `
+          <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+              <div class="row g-0">
+                <div class="col-4 d-flex align-items-center justify-content-center p-2">
+                  <img src="${product.thumbnail}" alt="${product.title}" class="img-fluid rounded" style="max-height: 100px;">
+                </div>
+                <div class="col-8">
+                  <div class="card-body p-2">
+                    <h6 class="card-title text-success">${product.title}</h6>
+                    <p class="card-text mb-1"><strong>Precio:</strong> $${product.price}</p>
+                    <p class="card-text mb-1"><strong>Cantidad:</strong> ${product.quantity}</p>
+                    <p class="card-text mb-1"><strong>Total:</strong> $${product.total.toFixed(2)}</p>
+                    <p class="card-text text-muted small">Descuento: $${product.discountedTotal.toFixed(2)}</p>
                   </div>
                 </div>
               </div>
-              <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-              </div>
             </div>
           </div>
-        </div>`;
+          `;
+                });
 
-            document.getElementById('viewModal').innerHTML = modalProduct;
-            const modal = new bootstrap.Modal(document.getElementById('modalProduct'));
-            modal.show();
+                cartsHtml += `
+          </div>
+          <hr>
+          <div class="mt-2 d-flex justify-content-end">
+            <span class="me-3 fw-bold"> Total sin descuento: $${cart.total.toFixed(2)}</span>
+            <span class="fw-bold text-success"> Total con descuento: $${cart.discountedTotal.toFixed(2)}</span>
+          </div>
+        </div>
+        `;
+            });
+
+            document.getElementById('info').innerHTML = cartsHtml;
         })
         .catch(error => {
-            console.error('Error al obtener el producto:', error);
-            document.getElementById('info').innerHTML = '<h3 class="text-danger">No se encontró el producto</h3>';
+            console.error('Error al cargar los carritos:', error);
+            document.getElementById('info').innerHTML = '<p class="text-danger">Ocurrió un error al cargar los carritos.</p>';
         });
 }
+
