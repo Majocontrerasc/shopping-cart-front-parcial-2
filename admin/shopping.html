@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mattelsa</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-success bg-opacity-25 min-vh-100 d-flex flex-column justify-content-between">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg bg-success navbar-dark mt-3 rounded">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold" href="#"> Mattelsa</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="shopping.html">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#users" onclick="users()">Usuarios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#products" onclick="products()">Productos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#cart" onclick="products()">Compras</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#logout" onclick="logout()">Salir</a>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="row mt-5 justify-content-center">
+            <div class="col-12 col-md-8">
+                <div class="card border-success shadow-sm">
+                    <div class="card-header bg-success text-white text-center" id="cardHeader">
+                        <div>Bienvenido, <span id="usuarioNombre"></span></div>
+
+                    </div>
+                    <div class="card-body text-center" id="info">
+                        <h2 class="text-success">Moda sostenible, estilo único</h2>
+                        <p class="mt-3 text-secondary">
+                            Mattelsa es una marca de ropa comprometida con el medio ambiente...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row mt-5">
+            <div class="col text-center">
+                <p class="text-success fw-light">&copy; Copy right 2025</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="viewModal"></div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/shoppingService.js"></script>
+    <script src="../js/userService.js"></script>
+    <script src="../js/productService.js"></script>
+    <script src="../js/cartService.js"></script>
+
+
+
+</body>
+<script>
+    window.onload = async () => {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            document.getElementById('usuarioBienvenida').innerText = 'No has iniciado sesión.';
+            return;
+        }
+
+        try {
+            const response = await fetch('https://dummyjson.com/auth/me', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                credentials: 'include'
+            });
+
+            const user = await response.json();
+
+            if (response.ok) {
+                document.getElementById('usuarioNombre').textContent = `${user.firstName} ${user.lastName}`;
+            } else {
+                throw new Error('Token inválido o expirado');
+            }
+        } catch (error) {
+            console.error('Error al obtener usuario:', error);
+            document.getElementById('usuarioBienvenida').innerText = 'Sesión inválida. Inicia sesión nuevamente.';
+        }
+    };
+</script>
+
+
+
+</html>
