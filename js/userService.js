@@ -1,137 +1,94 @@
-function users(page){
-    document.getElementById('cardHeader').innerHTML = '<h5>Listado de usuarios</h5>'
-    const REQRES_ENDPOINT = 'https://reqres.in/api/users?page='+page
-    fetch(REQRES_ENDPOINT, {
-        method: 'GET',
-        headers: {
-            'Content-type': 'application/json',
-            'x-api-key': 'reqres-free-v1'
-        }
-    })
-    .then((response) =>{
-        return response.json().then(
-            data => {
-                return {
-                    status: response.status,
-                    info: data
-                }
-            }
-        )
-    })
-    .then((result) => {
-        if(result.status === 200){
-            let listUsers = `
-                <table class="table">
-                    <thead>
+function users() {
+    document.getElementById('cardHeader').innerHTML = '<h5 class="text-white">Lista de Usuarios</h5>';
+    const FAKESTORE_ENDPOINT = 'https://dummyjson.com/users';
+
+    fetch(FAKESTORE_ENDPOINT, { method: 'GET' })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Usuarios:', data);
+
+            let listUser = `
+            <div class="table-responsive">
+                <table class="table table-striped table-hover border-success">
+                    <thead class="table-success text-white">
                         <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Apellido</th>
-                        <th scope="col">Avatar</th>
-                        <th scope="col">Acción</th>
+                            <th scope="col">#</th>
+                            <th scope="col">firstName</th>
+                            <th scope="col">lastName</th>
+                            <th scope="col">maidenName</th>
+                            <th scope="col">Acción</th>
                         </tr>
                     </thead>
-                    <tbody>
-            `
-            result.info.data.forEach(user => {
-                listUsers = listUsers + `
+                    <tbody>`;
+
+            data.users.forEach(user => {
+                listUser += `
                     <tr>
                         <td>${user.id}</td>
-                        <td>${user.first_name}</td>
-                        <td>${user.last_name}</td>
-                        <td><img src="${user.avatar}" class="img-thumbnail" alt="avatar del usuario"></td>
-                        <td> <button type="button" class="btn btn-outline-info" onclick="getUser('${user.id}')" >ver</button> </td>
-                    </tr>
-                `  
+                        <td class="text-primary">${user.firstName}</td>
+                        <td class="fw-bold text-success">${user.lastName}</td>
+                        <td class="text-secondary">${user.maidenName}</td>
+      
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-success" onclick="getUser(${user.id})">
+                                Ver Detalles
+                            </button>
+                        </td>
+                    </tr>`;
             });
-            listUsers = listUsers + `
-                </tbody>
-            </table>
-            <nav aria-label="Page navigation example">
-                <ul class="pagination">
-                    <li class="page-item">
-                    <a class="page-link" href="#" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                        </li>
-                        <li class="page-item"><a class="page-link" href="#usersPage1" onclick="users('1')">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#usersPage2" onclick="users('2')">2</a></li>
-                        <li class="page-item">
-                        <a class="page-link" href="#" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                        </li>
-                </ul>
-                </nav>
-            `
-            document.getElementById('info').innerHTML = listUsers
-        }
-        else{
-            document.getElementById('info').innerHTML = 'No existen usuarios en la BD'
-        }
-    })
+
+            listUser += `
+                    </tbody>
+                </table>
+            </div>`;
+
+            document.getElementById('info').innerHTML = listUser;
+        })
+        .catch(error => {
+            console.error('Error al obtener los usuarios:', error);
+            document.getElementById('info').innerHTML = '<p class="text-danger">Error al cargar usuarios</p>';
+        });
 }
 
-function getUser(idUser){
-    const REQRES_ENDPOINT = 'https://dummyjson.com/users'+idUser
-    fetch(REQRES_ENDPOINT, {
-        method: 'GET',
-        headers: {
-            'Content-type': 'application/json',
-            'x-api-key': 'reqres-free-v1'
-        }
-    })
-    .then((response) =>{
-        return response.json().then(
-            data => {
-                return {
-                    status: response.status,
-                    info: data
-                }
-            }
-        )
-    })
-    .then((result)=>{
-        if(result.status === 200){
-            const user = result.info.data
-            ShowModalUser(user)
+function getUser(idUser) {
+    const FAKESTORE_ENDPOINT = `https://dummyjson.com/users/${idUser}`;
+
+    fetch(FAKESTORE_ENDPOINT, { method: 'GET' })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Usuario:', data);
             
-        }else{
-            document.getElementById('info').innerHTML =
-            '<h3>No se encontro el Usuario el la Api</h3>'
-        }
-    })
-
-}
-function ShowModalUser(user){
-    const modalUser = `
-        <!-- Modal -->
-        <div class="modal fade" id="showModalUser" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog ">
-            <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Ver Usuario</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="card" >
-                    <img src="${user.avatar}" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <h5 class="card-title">Informacion Usuario</h5>
-                        <p class="card-text">Correo:${user.email}</p>
-                        <p class="card-text">Nombre:${user.first_name}</p>
-                        <p class="card-text">Apellido:${user.last_name}</p>
+            const modalUser = `
+            <div class="modal fade" id="modalUser" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title">Detalles del Usuario</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <div class="card shadow-sm border-success">
+                                <img src="${data.image}" class="card-img-top rounded-circle mx-auto mt-3" style="width: 150px;" alt="Avatar">
+                                <div class="card-body">
+                                    <h5 class="card-title text-success">${data.name}</h5>
+                                    <p class="card-text"><strong>Correo:</strong> ${data.email}</p>
+                                    <p class="card-text"><strong>Rol:</strong> ${data.role}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-            </div>
-        </div>
-        </div>
-    `
-    document.getElementById('modalUser').innerHTML = modalUser
-    const modal = new bootstrap.Modal(document.getElementById('showModalUser'))
-    modal.show()
+            </div>`;
+
+            document.getElementById('viewModal').innerHTML = modalUser;
+            const modal = new bootstrap.Modal(document.getElementById('modalUser'));
+            modal.show();
+        })
+        .catch(error => {
+            console.error('Error al obtener el usuario:', error);
+            document.getElementById('info').innerHTML = '<h3 class="text-danger">No se encontró el usuario en la API</h3>';
+        });
 }
